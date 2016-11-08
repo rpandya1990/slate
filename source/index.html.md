@@ -57,7 +57,7 @@ curl --request GET --url http://127.0.0.1:8001/vms/
     "status": "PAUSING",
     "vcpus": 2,
     "vm_name": "xx"
-  },....
+  },
 ]
 ```
 
@@ -111,7 +111,7 @@ curl --request GET --url http://127.0.0.1:8001/vms/vm_details/15/
       "size": "20 GB",
       "source_image": "Ubuntu 16.04 X64",
       "status": "RUNNING"
-    }, ...
+    },
   ]
 }
 ```
@@ -174,7 +174,7 @@ curl --request PUT --url 'http://127.0.0.1:8001/vms/vm_details/15/?description=h
       "size": "20 GB",
       "source_image": "Ubuntu 16.04 X64",
       "status": "RUNNING"
-    }, ...
+    },
   ]
 }
 ```
@@ -245,7 +245,7 @@ curl --request PATCH --url 'http://127.0.0.1:8001/vms/vm_details/15/?description
       "size": "20 GB",
       "source_image": "Ubuntu 16.04 X64",
       "status": "RUNNING"
-    }, ...
+    },
   ]
 }
 ```
@@ -426,7 +426,7 @@ curl -X GET "http://127.0.0.1:8001/vms/flavors/"
     "network_usage": 3000,
     "ram": 2,
     "vcpus": 2
-  }, ...
+  },
 ]
 ```
 
@@ -466,7 +466,7 @@ curl -X GET "http://127.0.0.1:8001/vms/payload/"
       "network_usage": 2000,
       "ram": 1,
       "vcpus": 1
-    }, ...
+    },
   ],
   "volumes": [
     {
@@ -474,7 +474,7 @@ curl -X GET "http://127.0.0.1:8001/vms/payload/"
       "hourly": 0.002,
       "id": 1,
       "monthly": 1
-    }, ...
+    },
   ]
 ```
 
@@ -483,3 +483,173 @@ This endpoint retrieves the payload information.
 ### HTTP Request
 
 GET /vms/payload/ HTTP/1.1
+
+## Delete an Orbit
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/13/delete/"
+
+response = requests.request("POST", url, headers=headers)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url http://127.0.0.1:8001/vms/13/delete/
+```
+
+> The above command returns JSON structured like this:
+
+```json
+"Virtual Machine is in pausing status, please wait until it finish."
+```
+
+This endpoint deletes a specific Orbit.
+
+### HTTP Request
+
+`POST /vms/<orbit_id>/delete/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+orbit_id | string | Yes | Primary key of the orbit
+
+## Get all Resize options
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/14/resize"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl --request GET --url http://127.0.0.1:8001/vms/14/resize
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+  {
+    "flavor_code": "02004",
+    "hourly": 0.066,
+    "id": 3,
+    "is_configurable": false,
+    "name": "Comet",
+    "network_usage": 3000,
+    "ram": 4,
+    "vcpus": 2
+  },
+  {
+    "flavor_code": "04008",
+    "hourly": 0.145,
+    "id": 4,
+    "is_configurable": false,
+    "name": "Nova",
+    "network_usage": 5000,
+    "ram": 8,
+    "vcpus": 4
+  },
+]
+```
+
+This endpoint retrieves the resize options available for a particular orbit.
+
+### HTTP Request
+
+`GET /vms/<orbit_id>/resize HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+orbit_id | string | Yes | Primary key of the orbit
+
+## Resize an orbit
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/15/resize/"
+
+querystring = {"flavor_id":"5"}
+
+response = requests.request("POST", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url 'http://127.0.0.1:8001/vms/15/resize/?flavor_id=5'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+"Please boot up the Virtual Machine before resizing"
+```
+
+This endpoint resizes an orbit given a flavor_id retrieved from GET Resize API.
+
+### HTTP Request
+
+`POST /vms/15/resize/?flavor_id=<flavor id> HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+orbit_id | string | Yes | Primary key of the orbit
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+flavor_id | Int | Yes | Flavor to resize to
+
+## Start/Pause/Reboot Orbit
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/action/"
+
+querystring = {"action":"reboot","orbit_id":"20"}
+
+response = requests.request("POST", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url 'http://127.0.0.1:8001/vms/action/?action=reboot&orbit_id=20'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+"\"Virtual Machine is in booting status, please wait until it finish.\""
+```
+
+This endpoint performs an action(Pause/Reboot/Start) on an orbit.
+
+### HTTP Request
+
+`POST /vms/action/?action=<action_name>&amp;orbit_id=<orbit_id> HTTP/1.1`
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+action | string("start", "pause", reboot) | Yes | Action which can be applied to the orbit
+orbit_id | Int | Yes | Orbit ID
+transaction_id | string | No | Transaction ID
+
