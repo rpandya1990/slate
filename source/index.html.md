@@ -1,15 +1,11 @@
 ---
-title: API Reference
+title: System on Grid API Reference
 
 language_tabs:
-  - shell
-  - ruby
+  - shell: cURL
   - python
-  - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
 
 includes:
   - errors
@@ -19,80 +15,338 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the System on Grid API, you can use our API to access create/modify/delete orbits and volumes along with other actions.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+You can view response examples in the dark area to the right in JSON format, and you can switch the programming language of the examples with the tabs in the top right.
 
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
+This example API documentation page was created with [Slate](https://github.com/tripit/slate). 
 
-# Authentication
 
-> To authorize, use this code:
+# Orbits
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
+## Get All Orbits
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
+url = "http://127.0.0.1:8001/vms/"
+
+response = requests.request("GET", url)
+
+print(response.text)
 ```
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+curl --request GET --url http://127.0.0.1:8001/vms/
 ```
 
-```javascript
-const kittn = require('kittn');
+> The above command returns JSON structured like this:
 
-let api = kittn.authorize('meowmeowmeow');
+```json
+[
+  {
+    "availability_zone": "xx",
+    "created_at": "2016-10-25T15:54:14Z",
+    "delete_root": false,
+    "description": null,
+    "id": 13,
+    "ipaddr": "192.168.x.x",
+    "is_active": true,
+    "progress": 6,
+    "ram": 2,
+    "status": "PAUSING",
+    "vcpus": 2,
+    "vm_name": "xx"
+  },....
+]
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+This endpoint retrieves all orbits/VM's.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+### HTTP Request
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+`GET /vms HTTP/1.1`
 
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
+## Get a particular Orbit
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
+url = "http://127.0.0.1:8001/vms/vm_details/15/"
+
+response = requests.request("GET", url)
+
+print(response.text)
 ```
 
 ```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+curl --request GET --url http://127.0.0.1:8001/vms/vm_details/15/
 ```
 
-```javascript
-const kittn = require('kittn');
+> The above command returns JSON structured like this:
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+```json
+{
+  "admin_pwd": "xxx",
+  "availability_zone": "xx",
+  "created_at": "2016-10-25T15:55:39Z",
+  "delete_root": false,
+  "description": null,
+  "id": 15,
+  "ipaddr": "192.168.222.40",
+  "is_active": true,
+  "progress": 6,
+  "ram": 2,
+  "ssh_key_value": "xx",
+  "status": "RUNNING",
+  "vcpus": 2,
+  "vm_name": "xx",
+  "volume_model": [
+    {
+      "created_at": "2016-10-25T15:56:05Z",
+      "id": 3,
+      "is_root": true,
+      "nickname": "xx",
+      "partition": null,
+      "size": "20 GB",
+      "source_image": "Ubuntu 16.04 X64",
+      "status": "RUNNING"
+    }, ...
+  ]
+}
+```
+
+This endpoint retrieves a specific Orbit.
+
+### HTTP Request
+
+`GET /vms/vm_details/<pk>/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+pk | string | Yes | Primary key of the orbit(orbit_id)
+
+## Modify a particular Orbit
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/vm_details/15/"
+
+querystring = {"vm_name":"xxx", "delete_root":"true", "description":"xxx"}
+
+response = requests.request("PUT", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request PUT --url 'http://127.0.0.1:8001/vms/vm_details/15/?description=hi&vm_name=d%60&delete_root=false/'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "admin_pwd": "xxx",
+  "availability_zone": "xx",
+  "created_at": "2016-10-25T15:55:39Z",
+  "delete_root": false,
+  "description": "hi",
+  "id": 15,
+  "ipaddr": "192.168.222.40",
+  "is_active": true,
+  "progress": 6,
+  "ram": 2,
+  "ssh_key_value": "xx",
+  "status": "RUNNING",
+  "vcpus": 2,
+  "vm_name": "xx",
+  "volume_model": [
+    {
+      "created_at": "2016-10-25T15:56:05Z",
+      "id": 3,
+      "is_root": true,
+      "nickname": "xx",
+      "partition": null,
+      "size": "20 GB",
+      "source_image": "Ubuntu 16.04 X64",
+      "status": "RUNNING"
+    }, ...
+  ]
+}
+```
+
+This endpoint modifies a specific Orbit.
+
+### HTTP Request
+
+`PUT /vms/vm_details/<pk>/?description=hi&amp;vm_name=<Name>;delete_root=false HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+pk | string | Yes | Primary key of the orbit(orbit_id)
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+vm_name | string | Yes | Name of the orbit
+description | string | No | Description of the orbit
+delete_root | Bool | No | Whether root can be deleted
+
+## Patch a particular Orbit
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/vm_details/15/"
+
+querystring = {"vm_name":"xxx", "delete_root":"true", "description":"xxx"}
+
+response = requests.request("PATCH", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request PATCH --url 'http://127.0.0.1:8001/vms/vm_details/15/?description=hi&vm_name=d%60&delete_root=false'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "admin_pwd": "xxx",
+  "availability_zone": "xx",
+  "created_at": "2016-10-25T15:55:39Z",
+  "delete_root": false,
+  "description": "hi",
+  "id": 15,
+  "ipaddr": "192.168.222.40",
+  "is_active": true,
+  "progress": 6,
+  "ram": 2,
+  "ssh_key_value": "xx",
+  "status": "RUNNING",
+  "vcpus": 2,
+  "vm_name": "xx",
+  "volume_model": [
+    {
+      "created_at": "2016-10-25T15:56:05Z",
+      "id": 3,
+      "is_root": true,
+      "nickname": "xx",
+      "partition": null,
+      "size": "20 GB",
+      "source_image": "Ubuntu 16.04 X64",
+      "status": "RUNNING"
+    }, ...
+  ]
+}
+```
+
+This endpoint patches a specific Orbit.
+
+### HTTP Request
+
+`PATCH /vms/vm_details/15/?vm_name=xxx&amp;description=hi&amp;delete_root=true HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+pk | string | Yes | Primary key of the orbit(orbit_id)
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+vm_name | string | No | Name of the orbit
+description | string | No | Description of the orbit
+delete_root | Bool | No | Whether root can be deleted
+
+## Create an orbit
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/create/"
+
+querystring = {"vm_name":"xxx","vm_count":"1","flavor":"2","root_size":"20","availability_zone":"xx","ssh_key_value":"xx","admin_pwd":"xx","transaction_id":"xx","booting_image":"3"}
+
+response = requests.request("POST", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url 'http://127.0.0.1:8001/vms/create/?vm_name=xxx&vm_count=1&flavor=2&root_size=20&availability_zone=xx&ssh_key_value=xx&admin_pwd=xx&transaction_id=xx&booting_image=3'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "admin_pwd": "xx",
+  "availability_zone": "xx",
+  "created_at": "2016-11-08T16:32:46.124412Z",
+  "delete_root": false,
+  "description": null,
+  "id": 30,
+  "ipaddr": null,
+  "is_active": false,
+  "progress": 0,
+  "ram": 2,
+  "ssh_key_value": "xx",
+  "status": "CREATING",
+  "vcpus": 2,
+  "vm_name": "xx",
+  "volume_model": []
+}
+```
+
+This endpoint creates an Orbit.
+
+### HTTP Request
+
+`POST /vms/create/?vm_name=xx&amp;vm_count=1&amp;flavor=2&amp;root_size=20&amp;availability_zone=xx&amp;ssh_key_value=xx&amp;admin_pwd=xx&amp;transaction_id=xx&amp;booting_image=3 HTTP/1.1`
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+vm_name | string | Yes | Name of the orbit
+vm_count | Int | Yes | Number of orbits
+flavor | Int | Yes | Type of Flavor
+root_size | Int | Yes | Size of root
+availability_zone | string | No | zone where orbit is created
+ssh_key_value | string | Yes | ssh key
+admin_pwd | string | Yes | Administrator password
+transaction_id | string | Yes | Transaction ID
+delete_root | Bool | No | Whether root can be deleted
+booting_image | Int | Either booting image or booting_volume required | Image to boot from
+booting_volume | Int | Either booting image or booting_volume required | Volume to boot from
+description | string | No | Description of the orbit
+
+## Get All Images
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/images/"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl --request GET --url http://127.0.0.1:8001/vms/images/
 ```
 
 > The above command returns JSON structured like this:
@@ -101,89 +355,131 @@ let kittens = api.kittens.get();
 [
   {
     "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+    "image_name": "Fedora 24",
+    "os_distro": "Fedora"
   },
   {
     "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+    "image_name": "Ubuntu 16.04 X64",
+    "os_distro": "Ubuntu"
+  },
+  {
+    "id": 3,
+    "image_name": "Ubuntu 14.04 X64",
+    "os_distro": "Ubuntu"
+  },
+  {
+    "id": 4,
+    "image_name": "Ubuntu 15.10 X64",
+    "os_distro": "Ubuntu"
+  },
+  {
+    "id": 5,
+    "image_name": "CentOS 7.2 X64",
+    "os_distro": "Centos"
   }
 ]
 ```
 
-This endpoint retrieves all kittens.
+This endpoint retrieves all images.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+GET /vms/images/ HTTP/1.1
 
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
+## Get All Flavors
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
+url = "http://127.0.0.1:8001/vms/flavors/"
+
+response = requests.request("GET", url)
+
+print(response.text)
 ```
 
 ```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
+curl -X GET "http://127.0.0.1:8001/vms/flavors/"
 ```
 
-```javascript
-const kittn = require('kittn');
+> The above command returns JSON structured like this:
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+```json
+[
+  {
+    "flavor_code": "01001",
+    "hourly": 0.014,
+    "id": 1,
+    "is_configurable": false,
+    "name": "Meteor",
+    "network_usage": 2000,
+    "ram": 1,
+    "vcpus": 1
+  },
+  {
+    "flavor_code": "02002",
+    "hourly": 0.031,
+    "id": 2,
+    "is_configurable": false,
+    "name": "Asteroid",
+    "network_usage": 3000,
+    "ram": 2,
+    "vcpus": 2
+  }, ...
+]
+```
+
+This endpoint retrieves all flavors.
+
+### HTTP Request
+
+GET /vms/flavors/ HTTP/1.1
+
+## Get Payloads
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/vms/payload/"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl -X GET "http://127.0.0.1:8001/vms/payload/"
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
+  "flavors": [
+    {
+      "flavor_code": "01001",
+      "hourly": 0.014,
+      "id": 1,
+      "is_configurable": false,
+      "name": "Meteor",
+      "network_usage": 2000,
+      "ram": 1,
+      "vcpus": 1
+    }, ...
+  ],
+  "volumes": [
+    {
+      "capacity": 20,
+      "hourly": 0.002,
+      "id": 1,
+      "monthly": 1
+    }, ...
+  ]
 ```
 
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+This endpoint retrieves the payload information.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
+GET /vms/payload/ HTTP/1.1
