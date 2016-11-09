@@ -5,8 +5,6 @@ language_tabs:
   - shell: cURL
   - python
 
-toc_footers:
-
 includes:
   - errors
 
@@ -179,7 +177,7 @@ curl --request PUT --url 'http://127.0.0.1:8001/vms/vm_details/15/?description=h
 }
 ```
 
-This endpoint modifies a specific Orbit.
+This endpoint modifies name, description or delete_root for a specific Orbit.
 
 ### HTTP Request
 
@@ -250,7 +248,7 @@ curl --request PATCH --url 'http://127.0.0.1:8001/vms/vm_details/15/?description
 }
 ```
 
-This endpoint patches a specific Orbit.
+This endpoint patches name, description or delete_root for a specific Orbit.
 
 ### HTTP Request
 
@@ -500,7 +498,7 @@ print(response.text)
 curl --request POST --url http://127.0.0.1:8001/vms/13/delete/
 ```
 
-> The above command returns JSON structured like this:
+> The above command returns the following response:
 
 ```json
 "Virtual Machine is in pausing status, please wait until it finish."
@@ -591,7 +589,7 @@ print(response.text)
 curl --request POST --url 'http://127.0.0.1:8001/vms/15/resize/?flavor_id=5'
 ```
 
-> The above command returns JSON structured like this:
+> The above command returns the following response:
 
 ```json
 "Please boot up the Virtual Machine before resizing"
@@ -633,7 +631,7 @@ print(response.text)
 curl --request POST --url 'http://127.0.0.1:8001/vms/action/?action=reboot&orbit_id=20'
 ```
 
-> The above command returns JSON structured like this:
+> The above command returns the following response:
 
 ```json
 "\"Virtual Machine is in booting status, please wait until it finish.\""
@@ -652,4 +650,572 @@ Parameter | Type | Required | Description
 action | string("start", "pause", reboot) | Yes | Action which can be applied to the orbit
 orbit_id | Int | Yes | Orbit ID
 transaction_id | string | No | Transaction ID
+
+# Volumes
+
+## Get All Volumes
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl --request GET --url http://127.0.0.1:8001/volume/
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+  {
+    "attached_to": "xxx",
+    "created_at": "2016-10-25T15:53:19Z",
+    "id": 1,
+    "is_bootable": true,
+    "is_root": true,
+    "nickname": "xxx",
+    "partition": null,
+    "size": "20 GB",
+    "source_image": "Fedora 24",
+    "status": "RUNNING"
+  },
+]
+```
+
+This endpoint retrieves all the volumes.
+
+### HTTP Request
+
+`GET /volume/ HTTP/1.1`
+
+## Create a volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/create/"
+
+querystring = {"nickname":"xxx","capacity":"20","attach_to":"23"}
+
+response = requests.request("POST", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl -X POST "http://127.0.0.1:8001/volume/create/?nickname=xxx&capacity=20&attach_to=23"
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "attached_to": "xxx",
+  "created_at": "2016-11-09T15:53:46.263823Z",
+  "id": 18,
+  "is_bootable": false,
+  "is_root": false,
+  "nickname": "xxx",
+  "partition": null,
+  "size": "20 GB",
+  "source_image": null,
+  "status": "CREATING"
+}
+```
+
+This endpoint retrieves a specific Orbit.
+
+### HTTP Request
+
+`POST /volume/create/?nickname=<nickname>&amp;capacity=20&amp;attach_to=<orbit ID> HTTP/1.1`
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+nickname | string | Yes | Nickname for the volume
+capacity | Int | Yes | Volume capacity in GB
+attach_to | Int | No | orbit ID of the VM to which volume will be attached
+partition | string | No | -
+
+## Get details for a particular Volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/18"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl --request GET --url http://127.0.0.1:8001/volume/18
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "attached_to": "xxx",
+  "created_at": "2016-11-09T15:53:46Z",
+  "id": 18,
+  "is_bootable": false,
+  "is_root": false,
+  "nickname": "xxx",
+  "partition": null,
+  "size": 20,
+  "source_image": null,
+  "status": "CREATING",
+  "virtual_machine": {
+    "availability_zone": "xxx",
+    "created_at": "2016-10-31T13:34:13Z",
+    "delete_root": false,
+    "description": null,
+    "id": 23,
+    "ipaddr": "192.168.222.158",
+    "is_active": true,
+    "progress": 6,
+    "ram": 2,
+    "status": "RUNNING",
+    "vcpus": 2,
+    "vm_name": "xxx"
+  }
+}
+```
+
+This endpoint retrieves details for a specific volume.
+
+### HTTP Request
+
+`GET /volume/<volume ID> HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+id | string | Yes | Primary key of the volume(volume_id)
+
+## Get details for a particular Volume(Update)
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/18/update/"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl --request GET --url http://127.0.0.1:8001/volume/18/update/
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "attached_to": "xxx",
+  "created_at": "2016-11-09T15:53:46Z",
+  "id": 18,
+  "is_bootable": false,
+  "is_root": false,
+  "nickname": "xxx",
+  "partition": null,
+  "size": "20 GB",
+  "source_image": null,
+  "status": "CREATING"
+}
+```
+
+This endpoint retrieves details for a specific volume(Update).
+
+### HTTP Request
+
+`GET /volume/<volume ID>/update/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+pk | string | Yes | Primary key of the volume(volume_id)
+
+
+## Modify a particular Volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/18/update/"
+
+querystring = {"nickname":"xxx"}
+
+response = requests.request("PUT", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request PUT --url 'http://127.0.0.1:8001/volume/18/update/?nickname=raghav'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "attached_to": "xxx",
+  "created_at": "2016-11-09T15:53:46Z",
+  "id": 18,
+  "is_bootable": false,
+  "is_root": false,
+  "nickname": "xxx",
+  "partition": null,
+  "size": "20 GB",
+  "source_image": null,
+  "status": "CREATING"
+}
+```
+
+This endpoint modifies nickname for a specific Volume.
+
+### HTTP Request
+
+`PUT /volume/<volume ID>/update/?nickname=raghav HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+pk | string | Yes | Primary key of the volume(volume_id)
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+nickname | string | Yes | Nickname of the volume
+
+## Patch a particular Volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/18/update/"
+
+querystring = {"nickname":"xxx"}
+
+response = requests.request("PATCH", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request PATCH --url 'http://127.0.0.1:8001/volume/18/update/?nickname=raghav'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "attached_to": "xxx",
+  "created_at": "2016-11-09T15:53:46Z",
+  "id": 18,
+  "is_bootable": false,
+  "is_root": false,
+  "nickname": "xxx",
+  "partition": null,
+  "size": "20 GB",
+  "source_image": null,
+  "status": "CREATING"
+}
+```
+
+This endpoint patches a specific Volume.
+
+### HTTP Request
+
+`PUT /volume/<volume ID>/update/?nickname=raghav HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+pk | string | Yes | Primary key of the volume(volume_id)
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+nickname | string | No | Nickname of the volume
+
+## Attach a volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/2/attach/12/"
+
+response = requests.request("POST", url)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url http://127.0.0.1:8001/volume/18/attach/12/
+```
+
+> The above command returns the following response:
+
+```json
+"Volume is already attached to Virtual Machine."
+```
+
+This endpoint attaches a Volume to an Orbit.
+
+### HTTP Request
+
+`POST /volume/<volume ID>/attach/<orbit ID>/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+id | string | Yes | Volume ID
+orbit_id | string | Yes | Orbit ID
+
+## Detach a volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/2/attach/12/"
+
+response = requests.request("POST", url)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url http://127.0.0.1:8001/volume/18/attach/12/
+```
+
+> The above command returns the following response:
+
+```json
+"Volume is in Creating status, please wait until it finish."
+```
+
+This endpoint detaches a Volume.
+
+### HTTP Request
+
+`POST /volume/<Volume ID>/detach/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+id | string | Yes | Volume ID
+
+## Get All Templates
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/templates"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl --request GET --url http://127.0.0.1:8001/volume/templates
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+  {
+    "capacity": 20,
+    "hourly": 0.002,
+    "id": 1,
+    "monthly": 1
+  },
+  {
+    "capacity": 40,
+    "hourly": 0.0041,
+    "id": 2,
+    "monthly": 2
+  },
+  {
+    "capacity": 80,
+    "hourly": 0.0083,
+    "id": 3,
+    "monthly": 4
+  },
+  {
+    "capacity": 120,
+    "hourly": 0.0125,
+    "id": 4,
+    "monthly": 6
+  },
+  {
+    "capacity": 240,
+    "hourly": 0.025,
+    "id": 5,
+    "monthly": 12
+  },
+  {
+    "capacity": 500,
+    "hourly": 0.052,
+    "id": 6,
+    "monthly": 25
+  },
+  {
+    "capacity": 1000,
+    "hourly": 0.104,
+    "id": 7,
+    "monthly": 50
+  }
+]
+```
+
+This endpoint retrieves all Volume templates.
+
+### HTTP Request
+
+GET /vms/images/ HTTP/1.1
+
+## Get all Resize options
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/2/resize/"
+
+response = requests.request("GET", url)
+
+print(response.text)
+```
+
+```shell
+curl -X GET "http://127.0.0.1:8001/volume/2/resize/"
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+  {
+    "capacity": 40,
+    "hourly": 0.0041,
+    "id": 2,
+    "monthly": 2
+  },
+  {
+    "capacity": 80,
+    "hourly": 0.0083,
+    "id": 3,
+    "monthly": 4
+  },
+]
+```
+
+This endpoint retrieves the resize options available for a particular volume
+
+### HTTP Request
+
+`GET /volume/<Volume ID>/resize/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+id | string | Yes | Volume ID
+
+## Resize a Volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/4/resize/"
+
+querystring = {"template_id":"3"}
+
+response = requests.request("POST", url, params=querystring)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url 'http://127.0.0.1:8001/volume/4/resize/?template_id=3'
+```
+
+> The above command returns the following response:
+
+```json
+"Please Pause the VM first"
+```
+
+This endpoint resizes a volume according to a template_id retrieved from GET Resize API.
+
+### HTTP Request
+
+`POST /volume/<Volume ID>/resize/?template_id=<Template ID> HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+id | string | Yes | Volume ID
+
+### Query Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+template_id | Int | Yes | Template to resize to
+
+
+## Delete a Volume
+
+```python
+import requests
+
+url = "http://127.0.0.1:8001/volume/18/delete/"
+
+response = requests.request("POST", url)
+
+print(response.text)
+```
+
+```shell
+curl --request POST --url http://127.0.0.1:8001/volume/18/delete/
+```
+
+> The above command returns the following response:
+
+```json
+"Please detach the volume before delete it"
+```
+
+This endpoint deletes a specific Volume.
+
+### HTTP Request
+
+`POST /volume/<volume ID>/delete/ HTTP/1.1`
+
+### Template Parameters
+
+Parameter | Type | Required | Description
+--------- | ------- | ------- | -----------
+id | string | Yes | Volume ID
 
